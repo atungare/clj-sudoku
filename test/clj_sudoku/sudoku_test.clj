@@ -58,6 +58,18 @@
                     1 2 3  4 5 6  7 8 9
                     1 2 3  4 5 6  7 8 9])
 
+(deftest ixy-test
+  (testing "i->xy"
+    (is (= (i->xy 1) {:x 1 :y 0}))
+    (is (= (i->xy 16) {:x 7 :y 1}))
+    (is (= (i->xy 54) {:x 0 :y 6}))
+    (is (= (i->xy 80) {:x 8 :y 8}))))
+
+(deftest noconflict-test
+  (testing "noconflict"
+    (is (= (noconflict 1) #{0 2 3 4 5 6 7 8 10 19 28 37 46 55 64 73 9 18 11 20}))
+    (is (= (noconflict 45) #{46 47 48 49 50 51 52 53 0 9 18 27 36 54 63 72 10 19 28 11 20 29}))))
+
 (deftest rows-test
   (testing "rows"
     (is (= (rows board) row-soln))))

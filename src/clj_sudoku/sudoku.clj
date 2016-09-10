@@ -5,6 +5,25 @@
   [x y]
     (+ x (* 9 y)))
 
+(defn i->xy
+  [i]
+  {:x (mod i 9) :y (quot i 9)})
+
+(defn noconflict
+  [i]
+  (let [{x :x y :y} (i->xy i)
+        row (for [a (range 0 9) :when (not= a x)]
+              (xy->i a y))
+        col (for [b (range 0 9) :when (not= b y)]
+              (xy->i x b))
+        c (quot x 3)
+        d (quot y 3)
+        grid (for [a (range c (+ c 3))
+                   b (range d (+ d 3))
+                   :when (not (and (= a x) (= b y)))]
+               (xy->i a b))]
+    (set (concat row col grid))))
+
 (defn rows
   "[a] -> [[a]]"
   [board]

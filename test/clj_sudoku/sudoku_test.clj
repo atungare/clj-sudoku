@@ -86,12 +86,6 @@
     (is (= (isSectionValid? [1 0 3]) true))
     (is (= (isSectionValid? [1 1 3]) false))))
 
-(deftest isSectionSolved-test
-  (testing "isSectionSolved?"
-    (is (= (isSectionSolved? [1 2 3]) true))
-    (is (= (isSectionSolved? [1 0 3]) false))
-    (is (= (isSectionSolved? [1 1 3]) false))))
-
 (deftest isBoardValid-test
   (testing "isBoardValid?"
     (is (= (isBoardValid? board) true))

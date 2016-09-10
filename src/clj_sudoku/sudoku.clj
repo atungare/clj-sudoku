@@ -1,22 +1,26 @@
 (ns clj-sudoku.sudoku)
 
 (defn xy->i
+  "Int -> Int -> Int"
   [x y]
     (+ x (* 9 y)))
 
 (defn rows
+  "[a] -> [[a]]"
   [board]
   (for [y (range 0 9)]
     (for [x (range 0 9)]
       (get board (xy->i x y)))))
 
 (defn cols
+  "[a] -> [[a]]"
   [board]
   (for [x (range 0 9)]
     (for [y (range 0 9)]
       (get board (xy->i x y)))))
 
 (defn grids
+  "[a] -> [[a]]"
   [board]
   (for [x (range 0 9 3)
         y (range 0 9 3)]
@@ -25,27 +29,28 @@
       (get board (xy->i a b)))))
 
 (defn board->sections
+  "[a] -> [[a]]"
   [board]
   (mapcat #(% board) [rows cols grids]))
 
 (defn isComplete?
+  "[Int] -> Boolean"
   [section_or_board]
   (not-any? zero? section_or_board))
 
 (defn isSectionValid?
+  "[Int] -> Boolean"
   [section]
   (let [values (remove zero? section)]
     (= (count values) (count (set values)))))
 
-(defn isSectionSolved?
-  [section]
-  (and (isComplete? section) (isSectionValid? section)))
-
 (defn isBoardValid?
+  "[Int] -> Boolean"
   [board]
   (every? isSectionValid? (board->sections board)))
 
 (defn updateFirst
+  "a -> a -> [a]"
   [x y lst]
   (:lst
     (reduce
@@ -57,10 +62,12 @@
       lst)))
 
 (defn updateBoard
+  "[Int] -> Int -> [Int]"
   [board trial]
   (updateFirst 0 trial board))
 
 (defn solveBoard
+  "[Int] -> [Int] || nil"
   [board]
   (if (isBoardValid? board)
     (if (isComplete? board)

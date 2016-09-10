@@ -81,20 +81,48 @@
   [board]
   (updateFirst #(not (number? %)) rest board))
 
+(defn strikeConflicts
+  [board]
+  (map-indexed
+    (fn [idx item]
+      (if (number? item)
+        item
+        (let [neigbor_indices (noconflict idx)]
+          (reduce
+            (fn [options neighbor_index]
+              (let [neighbor_val (get board neighbor_index)]
+                (if (number? neighbor_val)
+                  (remove #(= neighbor_val %) options)
+                  options)))
+            item
+            neigbor_indices))))
+    board))
+
+(defn doStrikeConflicts
+  [board]
+  (loop [prior board
+         new_board (strikeConflicts board)]
+    (if (= prior new_board)
+      new_board
+      (recur new_board (strikeConflicts new_board)))))
+
 (defn solveBoard
   [board]
-  (if (isBoardValid? board)
-    (if (isComplete? board)
-      board
-      (loop [prior board]
-        (let [trial_board (updateBoard prior)]
-          (if (nil? trial_board)
-            nil
-            (let [solution (solveBoard trial_board)]
-              (if (not (nil? solution))
-                solution
-                (recur (rejectTrial prior))))))))
-    nil))
+  (println "new")
+  (println board)
+  (let [reduced_board (doStrikeConflicts board)]
+    (if (isBoardValid? reduced_board)
+      (if (isComplete? reduced_board)
+        reduced_board
+        (loop [prior reduced_board]
+          (let [trial_board (updateBoard prior)]
+            (if (nil? trial_board)
+              nil
+              (let [solution (solveBoard trial_board)]
+                (if (not (nil? solution))
+                  solution
+                  (recur (rejectTrial prior))))))))
+      nil)))
 
 (defn initializeBoard
   [arr]
@@ -104,17 +132,6 @@
         [1 2 3 4 5 6 7 8 9]
         i))
     arr))
-
-; (defn strikeConflicts
-;   [board]
-;   ())
-
-; (defn strikeConflicts
-;   [board]
-;   (loop [next_board ()]
-;     (if (= board next_board)
-;       next_board
-;       (recur ()))))
 
 (defn -main [& args]
   (println "Hello"))

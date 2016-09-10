@@ -1,7 +1,6 @@
 (ns clj-sudoku.sudoku)
 
 (defn xy->i
-  "Int -> Int -> Int"
   [x y]
     (+ x (* 9 y)))
 
@@ -25,21 +24,18 @@
     (set (concat row col grid))))
 
 (defn rows
-  "[a] -> [[a]]"
   [board]
   (for [y (range 0 9)]
     (for [x (range 0 9)]
       (get board (xy->i x y)))))
 
 (defn cols
-  "[a] -> [[a]]"
   [board]
   (for [x (range 0 9)]
     (for [y (range 0 9)]
       (get board (xy->i x y)))))
 
 (defn grids
-  "[a] -> [[a]]"
   [board]
   (for [x (range 0 9 3)
         y (range 0 9 3)]
@@ -48,57 +44,77 @@
       (get board (xy->i a b)))))
 
 (defn board->sections
-  "[a] -> [[a]]"
   [board]
   (mapcat #(% board) [rows cols grids]))
 
 (defn isComplete?
-  "[Int] -> Boolean"
   [section_or_board]
-  (not-any? zero? section_or_board))
+  (every? number? section_or_board))
 
 (defn isSectionValid?
-  "[Int] -> Boolean"
   [section]
-  (let [values (remove zero? section)]
+  (let [values (filter number? section)]
     (= (count values) (count (set values)))))
 
 (defn isBoardValid?
-  "[Int] -> Boolean"
   [board]
   (every? isSectionValid? (board->sections board)))
 
 (defn updateFirst
-  "a -> a -> [a]"
-  [x y lst]
+  [pred transform lst]
   (:lst
     (reduce
       (fn [acc item]
-        (if (and (not (:seen acc)) (= item x))
-          {:lst (conj (:lst acc) y) :seen true}
+        (if (and (not (:seen acc)) (pred item))
+          {:lst (conj (:lst acc) (transform item)) :seen true}
           {:lst (conj (:lst acc) item) :seen (:seen acc)}))
       {:lst [] :seen false}
       lst)))
 
 (defn updateBoard
-  "[Int] -> Int -> [Int]"
-  [board trial]
-  (updateFirst 0 trial board))
+  [board]
+  (if (empty? (first (remove number? board)))
+    nil
+    (updateFirst #(not (number? %)) first board)))
+
+(defn rejectTrial
+  [board]
+  (updateFirst #(not (number? %)) rest board))
 
 (defn solveBoard
-  "[Int] -> [Int] || nil"
   [board]
   (if (isBoardValid? board)
     (if (isComplete? board)
       board
-      (loop [trial 1]
-        (if (> trial 9)
-          nil
-          (let [solution (solveBoard (updateBoard board trial))]
-            (if solution
-              solution
-              (recur (inc trial)))))))
+      (loop [prior board]
+        (let [trial_board (updateBoard prior)]
+          (if (nil? trial_board)
+            nil
+            (let [solution (solveBoard trial_board)]
+              (if (not (nil? solution))
+                solution
+                (recur (rejectTrial prior))))))))
     nil))
 
+(defn initializeBoard
+  [arr]
+  (map
+    (fn [i]
+      (if (= i 0)
+        [1 2 3 4 5 6 7 8 9]
+        i))
+    arr))
+
+; (defn strikeConflicts
+;   [board]
+;   ())
+
+; (defn strikeConflicts
+;   [board]
+;   (loop [next_board ()]
+;     (if (= board next_board)
+;       next_board
+;       (recur ()))))
+
 (defn -main [& args]
- (println "Hello"))
+  (println "Hello"))

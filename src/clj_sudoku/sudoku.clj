@@ -34,15 +34,16 @@
 
 (defn isSectionValid?
   [section]
-  (apply distinct? (remove zero? section)))
+  (let [values (remove zero? section)]
+    (= (count values) (count (set values)))))
 
 (defn isSectionSolved?
   [section]
   (and (isComplete? section) (isSectionValid? section)))
 
-(defn isBoardSolved?
+(defn isBoardValid?
   [board]
-  (every? isSectionSolved? (board->sections board)))
+  (every? isSectionValid? (board->sections board)))
 
 (defn updateFirst
   [x y lst]
@@ -61,17 +62,17 @@
 
 (defn solveBoard
   [board]
-  (if (isComplete? board)
-    (if (isBoardSolved? board)
+  (if (isBoardValid? board)
+    (if (isComplete? board)
       board
-      nil)
-    (loop [trial 1]
-      (if (> trial 9)
-        nil
-        (let [solution (solveBoard (updateBoard board trial))]
-          (if solution
-            solution
-            (recur (inc trial))))))))
+      (loop [trial 1]
+        (if (> trial 9)
+          nil
+          (let [solution (solveBoard (updateBoard board trial))]
+            (if solution
+              solution
+              (recur (inc trial)))))))
+    nil))
 
 (defn -main [& args]
  (println "Hello"))

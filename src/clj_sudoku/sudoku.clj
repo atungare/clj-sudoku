@@ -1,5 +1,5 @@
-(ns clj-sudoku.sudoku)
-(use '[clojure.string :as s])
+(ns clj-sudoku.sudoku
+  (:require [clojure.string :as s]))
 
 (defn xy->i
   [x y]
@@ -100,6 +100,8 @@
   [board]
   (updateFirst #(not (number? %)) rest board))
 
+
+
 (defn strikeConflicts
   [board]
   (map-indexed
@@ -159,13 +161,7 @@
 
 (defn initializeBoard
   [arr]
-  (vec
-    (map
-      (fn [i]
-        (if (= i 0)
-          [1 2 3 4 5 6 7 8 9]
-          i))
-    arr)))
+  (replace {0 [1 2 3 4 5 6 7 8 9]} arr))
 
 (defn -main [& args]
   (println (->> (slurp "http://projecteuler.net/project/resources/p096_sudoku.txt")

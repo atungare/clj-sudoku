@@ -1,4 +1,5 @@
 (ns clj-sudoku.sudoku)
+(use '[clojure.string :as s])
 
 (defn xy->i
   [x y]
@@ -117,4 +118,15 @@
     arr)))
 
 (defn -main [& args]
-  (println "Hello"))
+  (println (->> (slurp "http://projecteuler.net/project/resources/p096_sudoku.txt")
+             s/split-lines
+             (partition 10)
+             (map rest)
+             (map #(s/join "" %))
+             (map #(s/split % #""))
+             (map (fn [arr] (map read-string arr)))
+             (map initializeBoard)
+             (map solveBoard)
+             (map #(take 3 %))
+             (map #(+ (* 100 (nth % 0)) (* 10 (nth % 1)) (* 1 (nth % 2))))
+             (apply +))))

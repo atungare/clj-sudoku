@@ -65,26 +65,10 @@
     (is (= (i->xy 54) {:x 0 :y 6}))
     (is (= (i->xy 80) {:x 8 :y 8}))))
 
-(deftest noconflict-test
-  (testing "noconflict"
-    (is (= (noconflict 1) #{0 2 3 4 5 6 7 8 10 19 28 37 46 55 64 73 9 18 11 20}))
-    (is (= (noconflict 45) #{46 47 48 49 50 51 52 53 0 9 18 27 36 54 63 72 10 19 28 11 20 29}))))
-
-(deftest rows-test
-  (testing "rows"
-    (is (= (rows board) row-soln))))
-
-(deftest cols-test
-  (testing "cols"
-    (is (= (cols board) col-soln))))
-
-(deftest grids-test
-  (testing "grids"
-    (is (= (grids board) grids-soln))))
-
-(deftest boardToSections-test
-  (testing "board->sections"
-    (is (= (board->sections board) boardToSections-soln))))
+(deftest noconflictSet-test
+  (testing "noconflictSet"
+    (is (= (noconflictSet 1) #{0 2 3 4 5 6 7 8 10 19 28 37 46 55 64 73 9 18 11 20}))
+    (is (= (noconflictSet 45) #{0 72 27 46 54 48 50 36 29 28 51 47 9 53 38 18 52 37 63 49}))))
 
 (deftest isComplete-test
   (testing "isComplete?"
@@ -92,30 +76,19 @@
     (is (= (isComplete? [1 1 3]) true))
     (is (= (isComplete? [1 [] 3]) false))))
 
-(deftest isSectionValid-test
-  (testing "isSectionValid?"
-    (is (= (isSectionValid? [1 2 3]) true))
-    (is (= (isSectionValid? [1 [] 3]) true))
-    (is (= (isSectionValid? [1 1 3]) false))))
-
-; (deftest isBoardValid-test
-;   (testing "isBoardValid?"
-;     (is (= (isBoardValid? board) true))
-;     (is (= (isBoardValid? board_solved) true))
-;     (is (= (isBoardValid? board_invalid) false))
-;     (is (= (isBoardValid? pattern_board) true))))
+(deftest isBoardValid-test
+  (testing "isBoardValid?"
+    (is (= (isBoardValid? (initializeBoard board)) true))
+    (is (= (isBoardValid? (initializeBoard board_solved)) true))
+    (is (= (isBoardValid? (initializeBoard board_invalid)) false))
+    (is (= (isBoardValid? (initializeBoard pattern_board)) true))))
 
 (deftest updateFirst-test
   (testing "updateFirst"
     (is (= (updateFirst #(= 0 %) (fn [_] 1) [1 2 3 0]) [1 2 3 1]))
     (is (= (updateFirst #(= 0 %) (fn [_] 1) [1 2 3 0 0]) [1 2 3 1 0]))))
 
-; (deftest updateBoard-test
-;   (testing "updateBoard"
-;     (is (= (updateBoard [1 2 3 0] 2) [1 2 3 2]))
-;     (is (= (updateBoard [1 2 3 0 0] 2) [1 2 3 2 0]))))
-
 (deftest solveBoard-test
   (testing "solveBoard"
-    (is (= (solveBoard (initializeBoard board)) board_solved))))
+    (is (= (solveBoard (initializeBoard board)) [board_solved]))))
 

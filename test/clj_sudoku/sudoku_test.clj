@@ -58,6 +58,31 @@
                     1 2 3  4 5 6  7 8 9
                     1 2 3  4 5 6  7 8 9])
 
+(def almost_done_board [1 2 3  4 5 6  7 8 9
+                         4 5 6  7 8 9  1 2 3
+                         7 8 9  1 2 3  4 5 6
+
+                         2 3 4  5 6 7  8 9 1
+                         5 6 7  8 9 1  2 3 4
+                         8 9 1  2 3 4  5 6 7
+
+                         3 4 5  6 7 8  9 1 2
+                         6 7 8  9 1 2  3 4 5
+                         9 1 2  3 4 5  6 7 0])
+
+
+(def strike_conflicts_board [1 2 3  4 5 6  7 8 9
+                             4 5 6  7 8 9  1 2 3
+                             7 8 9  1 2 3  4 5 6
+
+                             2 3 4  5 6 7  8 9 1
+                             5 6 7  8 9 1  2 3 4
+                             8 9 1  2 3 4  5 6 7
+
+                             3 4 5  6 7 8  9 1 2
+                             6 7 8  9 1 2  3 4 5
+                             9 1 2  3 4 5  6 7 '(8)])
+
 (deftest ixy-test
   (testing "i->xy"
     (is (= (i->xy 1) {:x 1 :y 0}))
@@ -69,6 +94,22 @@
   (testing "noconflictSet"
     (is (= (noconflictSet 1) #{0 2 3 4 5 6 7 8 10 19 28 37 46 55 64 73 9 18 11 20}))
     (is (= (noconflictSet 45) #{0 72 27 46 54 48 50 36 29 28 51 47 9 53 38 18 52 37 63 49}))))
+
+(deftest rows-test
+  (testing "rows"
+    (is (= (rows board) row-soln))))
+
+(deftest cols-test
+  (testing "cols"
+    (is (= (cols board) col-soln))))
+
+(deftest grids-test
+  (testing "grids"
+    (is (= (grids board) grids-soln))))
+
+(deftest boardToSections-test
+  (testing "board->sections"
+    (is (= (sections board) boardToSections-soln))))
 
 (deftest isComplete-test
   (testing "isComplete?"
@@ -88,7 +129,15 @@
     (is (= (updateFirst #(= 0 %) (fn [_] 1) [1 2 3 0]) [1 2 3 1]))
     (is (= (updateFirst #(= 0 %) (fn [_] 1) [1 2 3 0 0]) [1 2 3 1 0]))))
 
+(deftest placeUniques-test
+  (testing "placeUniques"
+    (is (= (placeUniques (initializeBoard almost_done_board)) pattern_board))))
+
+(deftest strikeConflicts-test
+  (testing "strikeConflicts"
+    (is (= (strikeConflicts (initializeBoard almost_done_board)) strike_conflicts_board))))
+
 (deftest solveBoard-test
   (testing "solveBoard"
-    (is (= (solveBoard (initializeBoard board)) [board_solved]))))
+    (is (= (solveBoard (initializeBoard board)) board_solved))))
 

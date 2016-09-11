@@ -9,20 +9,55 @@
   [i]
   {:x (mod i 9) :y (quot i 9)})
 
-(defn noconflictSet
+(defn rows
+  [board]
+  (for [y (range 0 9)]
+    (for [x (range 0 9)]
+      (get board (xy->i x y)))))
+
+(defn cols
+  [board]
+  (for [x (range 0 9)]
+    (for [y (range 0 9)]
+      (get board (xy->i x y)))))
+
+(defn grids
+  [board]
+  (for [x (range 0 9 3)
+        y (range 0 9 3)]
+    (for [a (range x (+ x 3))
+          b (range y (+ y 3))]
+      (get board (xy->i a b)))))
+
+(defn sections
+  [board]
+  (apply concat ((juxt rows cols grids) board)))
+
+(defn myRow
+  [i]
+  (let [{x :x y :y} (i->xy i)]
+    (for [a (range 0 9) :when (not= a x)]
+      (xy->i a y))))
+
+(defn myCol
+  [i]
+  (let [{x :x y :y} (i->xy i)]
+    (for [b (range 0 9) :when (not= b y)]
+      (xy->i x b))))
+
+(defn myGrid
   [i]
   (let [{x :x y :y} (i->xy i)
-        row (for [a (range 0 9) :when (not= a x)]
-              (xy->i a y))
-        col (for [b (range 0 9) :when (not= b y)]
-              (xy->i x b))
-        c (* 3 (quot x 3))
-        d (* 3 (quot y 3))
-        grid (for [a (range c (+ c 3))
-                   b (range d (+ d 3))
-                   :when (not (and (= a x) (= b y)))]
-               (xy->i a b))]
-    (set (concat row col grid))))
+         c (* 3 (quot x 3))
+         d (* 3 (quot y 3))]
+    (for [a (range c (+ c 3))
+          b (range d (+ d 3))
+          :when (not (and (= a x) (= b y)))]
+      (xy->i a b))))
+
+(defn noconflictSet
+  [i]
+  (set (apply concat ((juxt myRow myCol myGrid) i))))
 
 (defn isComplete?
   [board]
@@ -71,7 +106,7 @@
     (fn [idx item]
       (if (number? item)
         item
-        (let [neigbor_indices (noconflictSet idx)]
+        (let [neighbor_indices (noconflictSet idx)]
           (reduce
             (fn [options neighbor_index]
               (let [neighbor_val (get board neighbor_index)]
@@ -79,21 +114,36 @@
                   (remove #(= neighbor_val %) options)
                   options)))
             item
-            neigbor_indices))))
+            neighbor_indices))))
     board))
 
-(defn doStrikeConflicts
+(defn placeUniques
   [board]
+  (map-indexed
+    (fn [idx item]
+      (if (number? item)
+        item
+        (let [neighbor_indices (noconflictSet idx)
+              neighbors (map #(get board %) neighbor_indices)
+              neighbor_values (set (flatten neighbors))
+              only_possible (first (filter #(not (contains? neighbor_values %)) item))]
+          (if (not (nil? only_possible))
+            only_possible
+            item))))
+    board))
+
+(defn iterateUntilNoChange
+  [board transform]
   (loop [prior board
-         new_board (strikeConflicts board)]
+         new_board (transform board)]
     (if (= prior new_board)
       new_board
-      (recur new_board (strikeConflicts new_board))))
+      (recur new_board (transform new_board))))
   board)
 
 (defn solveBoard
   [board]
-  (let [reduced_board (doStrikeConflicts board)]
+  (let [reduced_board (iterateUntilNoChange board (comp placeUniques strikeConflicts))]
     (if (isBoardValid? reduced_board)
       (if (isComplete? reduced_board)
         reduced_board

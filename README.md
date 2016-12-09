@@ -1,10 +1,11 @@
 # clj-sudoku
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure library designed to solve sudoku boards.
 
 ## Usage
 
-FIXME
+- `lein test` to run unit tests.
+- `lein run` to run the main program.
 
 ## License
 

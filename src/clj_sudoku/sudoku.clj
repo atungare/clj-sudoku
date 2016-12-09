@@ -100,8 +100,6 @@
   [board]
   (updateFirst #(not (number? %)) rest board))
 
-
-
 (defn strikeConflicts
   [board]
   (map-indexed
@@ -167,6 +165,7 @@
   (println (->> (slurp "http://projecteuler.net/project/resources/p096_sudoku.txt")
              s/split-lines
              (partition 10)
+             (take 2); should remove this
              (map rest)
              (map #(s/join "" %))
              (map #(s/split % #""))
